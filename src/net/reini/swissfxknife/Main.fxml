@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.net.*?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="net.reini.swissfxknife.Controller">
+	<center>
+		<TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+			<tabs>
+				<Tab text="Jaas Password">
+					<content>
+						<GridPane hgap="5.0" vgap="5.0">
+							<padding>
+								<Insets bottom="5" left="5" right="5" top="5" />
+							</padding>
+							<columnConstraints>
+								<ColumnConstraints hgrow="NEVER" maxWidth="65.0" minWidth="4.0" prefWidth="65.0" />
+								<ColumnConstraints hgrow="ALWAYS" />
+								<ColumnConstraints />
+							</columnConstraints>
+							<rowConstraints>
+								<RowConstraints />
+								<RowConstraints />
+								<RowConstraints />
+								<RowConstraints />
+							</rowConstraints>
+							<children>
+								<Label text="Cleartext" />
+								<TextField fx:id="password" onAction="#encrypt" GridPane.columnIndex="1" />
+								<Label text="Encrypted" GridPane.rowIndex="1" />
+								<TextField fx:id="passwordEncrypted" onAction="#dencrypt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+								<Label fx:id="errorReason" textFill="RED" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+							</children>
+						</GridPane>
+					</content>
+				</Tab>
+				<Tab text="Untitled Tab 2">
+					<content>
+						<AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+					</content>
+				</Tab>
+			</tabs>
+		</TabPane>
+	</center>
+</BorderPane>
