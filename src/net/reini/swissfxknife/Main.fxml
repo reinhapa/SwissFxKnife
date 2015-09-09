@@ -16,10 +16,10 @@
             <GridPane hgap="5.0" minWidth="-1.0" prefWidth="-1.0" vgap="5.0">
               <children>
                 <Label text="Cleartext" />
-                <TextField fx:id="password" onAction="#encrypt" GridPane.columnIndex="1" />
+                <TextField fx:id="jaasPassword" GridPane.columnIndex="1" />
                 <Label text="Encrypted" GridPane.rowIndex="1" />
-                <TextField fx:id="passwordEncrypted" onAction="#dencrypt" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                <Label fx:id="errorReason" textFill="RED" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                <TextField fx:id="jaasPasswordEncrypted" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label fx:id="jaasErrorReason" textFill="RED" GridPane.columnSpan="2" GridPane.rowIndex="3" />
               </children>
               <columnConstraints>
                 <ColumnConstraints hgrow="NEVER" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" />
@@ -38,11 +38,40 @@
             </GridPane>
           </content>
         </Tab>
+        <Tab text="Installer Password">
+          <content>
+            <GridPane hgap="5.0" minWidth="-1.0" prefWidth="-1.0" vgap="5.0">
+              <children>
+                <Label text="Cleartext" />
+                <TextField fx:id="installerPassword" GridPane.columnIndex="1" />
+                <Label text="Encrypted" GridPane.rowIndex="1" />
+                <TextField fx:id="installerPasswordEncrypted" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                <Label fx:id="installerErrorReason" textFill="RED" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+              </children>
+              <columnConstraints>
+                <ColumnConstraints hgrow="NEVER" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" />
+                <ColumnConstraints hgrow="ALWAYS" />
+                <ColumnConstraints />
+              </columnConstraints>
+              <padding>
+                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+              </padding>
+              <rowConstraints>
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+                <RowConstraints />
+              </rowConstraints>
+            </GridPane>
+          </content>
+        </Tab>
+        <!--
         <Tab text="Untitled Tab 2">
           <content>
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
           </content>
         </Tab>
+        -->
       </tabs>
     </TabPane>
   </center>

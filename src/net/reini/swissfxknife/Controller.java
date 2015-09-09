@@ -14,64 +14,115 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.spec.SecretKeySpec;
 
 public class Controller {
-    private static final byte[] KB = { 'j', 'a', 'a', 's', ' ', 'i', 's', ' ',
-	    't', 'h', 'e', ' ', 'w', 'a', 'y' };
-    private static final SecretKeySpec KEYSPEC = new SecretKeySpec(KB,
-	    "Blowfish");
-    private Cipher cipher;
+	private static final byte[] JAAS_KB = { 'j', 'a', 'a', 's', ' ', 'i', 's',
+			' ', 't', 'h', 'e', ' ', 'w', 'a', 'y' };
+	private static final byte[] INSTALLER_KB = { -65, -51, 99, 35, 103, -62,
+			-95, -118, -83, 91, -102, -113, 89, -108, -44, 57, -65, -51, 99,
+			35, 103, -62, -95, -118 };
 
-    @FXML
-    private TextField password;
-    @FXML
-    private TextField passwordEncrypted;
-    @FXML
-    private Label errorReason;
+	private static final SecretKeySpec JAAS_KEYSPEC = new SecretKeySpec(
+			JAAS_KB, "Blowfish");
+	private static final SecretKeySpec INSTALLER_KEYSPEC = new SecretKeySpec(
+			INSTALLER_KB, "TripleDES");
 
-    @FXML
-    private void initialize() throws Exception {
-	cipher = Cipher.getInstance("Blowfish");
-	password.textProperty().addListener(
-		(observable, oldValue, newValue) -> {
-		    try {
-			cipher.init(Cipher.ENCRYPT_MODE, KEYSPEC);
-			byte[] encoding = cipher.doFinal(newValue
-				.getBytes(StandardCharsets.UTF_8));
-			String encoded = new BigInteger(encoding).toString(16);
-			passwordEncrypted.setText(encoded);
-			errorReason.setText("");
-		    } catch (InvalidKeyException | IllegalBlockSizeException
-			    | BadPaddingException e) {
-			errorReason.setText(e.toString());
-		    }
-		});
-	passwordEncrypted.textProperty()
-		.addListener(
-			(observable, oldValue, newValue) -> {
-			    try {
-				byte[] encoding = new BigInteger(newValue, 16)
-					.toByteArray();
-				cipher.init(Cipher.DECRYPT_MODE, KEYSPEC);
-				byte[] decode = cipher.doFinal(encoding);
-				password.setText(new String(decode,
-					StandardCharsets.UTF_8));
-				errorReason.setText("");
-			    } catch (NumberFormatException e) {
-				errorReason.setText("Format wrong: "
-					+ e.getMessage());
-			    } catch (InvalidKeyException
-				    | IllegalBlockSizeException
-				    | BadPaddingException e) {
-				errorReason.setText("Decode failed: "
-					+ e.getMessage());
-			    }
-			});
-    }
+	private Cipher jaasCipher;
+	private Cipher installerCipher;
 
-    @FXML
-    public void encrypt() {
-    }
+	@FXML
+	private TextField jaasPassword;
+	@FXML
+	private TextField jaasPasswordEncrypted;
+	@FXML
+	private Label jaasErrorReason;
 
-    @FXML
-    public void dencrypt() {
-    }
+	@FXML
+	private TextField installerPassword;
+	@FXML
+	private TextField installerPasswordEncrypted;
+	@FXML
+	private Label installerErrorReason;
+
+	@FXML
+	private void initialize() throws Exception {
+		jaasCipher = Cipher.getInstance("Blowfish");
+		jaasPassword.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					try {
+						jaasCipher.init(Cipher.ENCRYPT_MODE, JAAS_KEYSPEC);
+						byte[] encoding = jaasCipher.doFinal(newValue
+								.getBytes(StandardCharsets.UTF_8));
+						String encoded = new BigInteger(encoding).toString(16);
+						jaasPasswordEncrypted.setText(encoded);
+						jaasErrorReason.setText("");
+					} catch (InvalidKeyException | IllegalBlockSizeException
+							| BadPaddingException e) {
+						jaasErrorReason.setText(e.toString());
+					}
+				});
+		jaasPasswordEncrypted.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					try {
+						byte[] encoding = new BigInteger(newValue, 16)
+								.toByteArray();
+						jaasCipher.init(Cipher.DECRYPT_MODE, JAAS_KEYSPEC);
+						byte[] decode = jaasCipher.doFinal(encoding);
+						jaasPassword.setText(new String(decode,
+								StandardCharsets.UTF_8));
+						jaasErrorReason.setText("");
+					} catch (NumberFormatException e) {
+						jaasErrorReason.setText("Format wrong: "
+								+ e.getMessage());
+					} catch (InvalidKeyException | IllegalBlockSizeException
+							| BadPaddingException e) {
+						jaasErrorReason.setText("Decode failed: "
+								+ e.getMessage());
+					}
+				});
+
+		installerCipher = Cipher.getInstance("TripleDES");
+		installerPassword.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					try {
+						installerCipher.init(Cipher.ENCRYPT_MODE,
+								INSTALLER_KEYSPEC);
+						byte[] encoding = installerCipher.doFinal(newValue
+								.getBytes(StandardCharsets.UTF_8));
+						String encoded = new BigInteger(encoding).toString(16);
+						installerPasswordEncrypted.setText(encoded);
+						installerErrorReason.setText("");
+					} catch (InvalidKeyException | IllegalBlockSizeException
+							| BadPaddingException e) {
+						installerErrorReason.setText(e.toString());
+					}
+				});
+		installerPasswordEncrypted.textProperty().addListener(
+				(observable, oldValue, newValue) -> {
+					try {
+						byte[] encoding = new BigInteger(newValue, 16)
+								.toByteArray();
+						installerCipher.init(Cipher.DECRYPT_MODE,
+								INSTALLER_KEYSPEC);
+						byte[] decode = installerCipher.doFinal(encoding);
+						installerPassword.setText(new String(decode,
+								StandardCharsets.UTF_8));
+						installerErrorReason.setText("");
+					} catch (NumberFormatException e) {
+						installerErrorReason.setText("Format wrong: "
+								+ e.getMessage());
+					} catch (InvalidKeyException | IllegalBlockSizeException
+							| BadPaddingException e) {
+						installerErrorReason.setText("Decode failed: "
+								+ e.getMessage());
+					}
+				});
+
+	}
+
+	@FXML
+	public void encrypt() {
+	}
+
+	@FXML
+	public void dencrypt() {
+	}
 }
