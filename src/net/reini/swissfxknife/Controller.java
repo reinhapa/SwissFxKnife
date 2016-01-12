@@ -3,6 +3,9 @@ package net.reini.swissfxknife;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
+import java.util.Base64;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
@@ -16,14 +19,16 @@ import javax.crypto.spec.SecretKeySpec;
 public class Controller {
 	private static final byte[] JAAS_KB = { 'j', 'a', 'a', 's', ' ', 'i', 's',
 			' ', 't', 'h', 'e', ' ', 'w', 'a', 'y' };
-	private static final byte[] INSTALLER_KB = { -65, -51, 99, 35, 103, -62,
-			-95, -118, -83, 91, -102, -113, 89, -108, -44, 57, -65, -51, 99,
-			35, 103, -62, -95, -118 };
+	private static final byte[] INSTALLER_KB = { 76, -101, -45, 56, 119, 73,
+			-40, 112, -91, 3, -11, 55, -38, -43, -122, -92, 76, -101, -45, 56,
+			119, 73, -40, 112 };
 
 	private static final SecretKeySpec JAAS_KEYSPEC = new SecretKeySpec(
 			JAAS_KB, "Blowfish");
 	private static final SecretKeySpec INSTALLER_KEYSPEC = new SecretKeySpec(
-			INSTALLER_KB, "TripleDES");
+			INSTALLER_KB, "TripleDES");;
+	private static final Pattern INSTALLER_KEY_PATTERN = Pattern
+			.compile("^_ENC_(.*)_ENC_$");
 
 	private Cipher jaasCipher;
 	private Cipher installerCipher;
@@ -87,8 +92,10 @@ public class Controller {
 								INSTALLER_KEYSPEC);
 						byte[] encoding = installerCipher.doFinal(newValue
 								.getBytes(StandardCharsets.UTF_8));
-						String encoded = new BigInteger(encoding).toString(16);
-						installerPasswordEncrypted.setText(encoded);
+						String encoded = Base64.getEncoder().encodeToString(
+								encoding);
+						installerPasswordEncrypted.setText(String.format(
+								"_ENC_%s_ENC_", encoded));
 						installerErrorReason.setText("");
 					} catch (InvalidKeyException | IllegalBlockSizeException
 							| BadPaddingException e) {
@@ -98,15 +105,22 @@ public class Controller {
 		installerPasswordEncrypted.textProperty().addListener(
 				(observable, oldValue, newValue) -> {
 					try {
-						byte[] encoding = new BigInteger(newValue, 16)
-								.toByteArray();
+						Matcher matcher = INSTALLER_KEY_PATTERN
+								.matcher(newValue);
+						byte[] encoding;
+						if (matcher.matches()) {
+							encoding = Base64.getDecoder().decode(
+									matcher.group(1));
+						} else {
+							encoding = Base64.getDecoder().decode(newValue);
+						}
 						installerCipher.init(Cipher.DECRYPT_MODE,
 								INSTALLER_KEYSPEC);
 						byte[] decode = installerCipher.doFinal(encoding);
 						installerPassword.setText(new String(decode,
 								StandardCharsets.UTF_8));
 						installerErrorReason.setText("");
-					} catch (NumberFormatException e) {
+					} catch (IllegalArgumentException e) {
 						installerErrorReason.setText("Format wrong: "
 								+ e.getMessage());
 					} catch (InvalidKeyException | IllegalBlockSizeException
