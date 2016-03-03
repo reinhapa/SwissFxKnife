@@ -51,3 +51,9 @@ Now let's link the application:
 jlink --modulepath $JAVA_HOME/jmods:mlib --addmods SwissFxKnife \
  --output SwissFxKnifeApp
 ```
+
+If you want it even smaller you can strip the debug infos *-G* and improve the resource compression *-c* as follows:
+```
+jlink --modulepath $JAVA_HOME/jmods:mlib --addmods SwissFxKnife \
+ --output SwissFxKnifeApp -G -c
+```
