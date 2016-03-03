@@ -10,7 +10,7 @@ javac -d mods/SwissFxKnife \
  src/net/reini/swissfxknife/Greeting.java
 ```
 
-Or a simpler way:
+or a simpler way:
 ```
 javac -d mods/SwissFxKnife $(find src -name "*.java")
 ```
@@ -39,6 +39,11 @@ jar -c -f mlib/swissfxknife.jar \
 Startable now with the module class path:
 ```
 java -mp mlib -m SwissFxKnife
+```
+
+or the greeting class using:
+```
+java -mp mlib -m SwissFxKnife/net.reini.swissfxknife.Greeting
 ```
 
 Now let's link the application:
