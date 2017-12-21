@@ -76,7 +76,7 @@ final class ConfigAccess {
                     try (JarOutputStream jarOut = new JarOutputStream(out)) {
                         // now writing the content of the byte array output stream to a jar entry
                         jarOut.putNextEntry(new JarEntry(CONFIG_BIN_FILENAME));
-                        writeConfig(new IgnoreCloseOutputStream(out), valueConsumer);
+                        writeConfig(new IgnoreCloseOutputStream(jarOut), valueConsumer);
                         jarOut.finish();
                     }
                 }
