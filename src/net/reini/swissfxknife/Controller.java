@@ -5,6 +5,7 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
+import java.util.Arrays;
 import java.util.Base64;
 import java.util.Comparator;
 import java.util.List;
@@ -42,6 +43,8 @@ public class Controller {
             {'j', 'a', 'a', 's', ' ', 'i', 's', ' ', 't', 'h', 'e', ' ', 'w', 'a', 'y'};
     private static final byte[] INSTALLER_KB = {76, -101, -45, 56, 119, 73, -40, 112, -91, 3, -11,
             55, -38, -43, -122, -92, 76, -101, -45, 56, 119, 73, -40, 112};
+    private static final byte[] DBEAVER_ENCRYPTION_KEY =
+            "sdf@!#$verf^wv%6Fwe%$$#FFGwfsdefwfe135s$^H)dg".getBytes();
     private static final SecretKeySpec JAAS_KEYSPEC = new SecretKeySpec(JAAS_KB, "Blowfish");
     private static final SecretKeySpec INSTALLER_KEYSPEC =
             new SecretKeySpec(INSTALLER_KB, "TripleDES");
@@ -62,6 +65,13 @@ public class Controller {
     private TextField jaasPasswordEncrypted;
     @FXML
     private Label jaasErrorReason;
+
+    @FXML
+    private TextField dbeaverPassword;
+    @FXML
+    private TextField dbeaverPasswordEncrypted;
+    @FXML
+    private Label dbeaverErrorReason;
 
     @FXML
     private TextField installerPassword;
@@ -86,6 +96,8 @@ public class Controller {
         jaasCipher = Cipher.getInstance("Blowfish");
         jaasPassword.textProperty().addListener(this::jaasPasswordChanged);
         jaasPasswordEncrypted.textProperty().addListener(this::jaasPasswordEncryptedChanged);
+        dbeaverPassword.textProperty().addListener(this::dbeaverPasswordChanged);
+        dbeaverPasswordEncrypted.textProperty().addListener(this::dbeaverPasswordEncryptedChanged);
         installerCipher = Cipher.getInstance("TripleDES");
         installerPassword.textProperty().addListener(this::installerPasswordChanged);
         installerPasswordEncrypted.textProperty()
@@ -181,6 +193,46 @@ public class Controller {
             jaasErrorReason.setText("Format wrong: " + e.getMessage());
         } catch (InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             jaasErrorReason.setText("Decode failed: " + e.getMessage());
+        }
+    }
+
+    void dbeaverPasswordChanged(ObservableValue<? extends String> observable, String oldValue,
+            String newValue) {
+        byte[] e = newValue.getBytes(StandardCharsets.UTF_8);
+        byte[] plainBytes = Arrays.copyOf(e, e.length + 2);
+        plainBytes[plainBytes.length - 2] = 0;
+        plainBytes[plainBytes.length - 1] = -127;
+        xorStringByKey(plainBytes);
+        dbeaverPasswordEncrypted.setText(Base64.getEncoder().encodeToString(plainBytes));
+        dbeaverErrorReason.setText("");
+    }
+
+    void dbeaverPasswordEncryptedChanged(ObservableValue<? extends String> observable,
+            String oldValue, String newValue) {
+        if (newValue != null && !newValue.isEmpty()) {
+            byte[] e = Base64.getDecoder().decode(newValue);
+            xorStringByKey(e);
+            if (e[e.length - 2] == 0 && e[e.length - 1] == -127) {
+                dbeaverPassword.setText(new String(e, 0, e.length - 2, StandardCharsets.UTF_8));
+                dbeaverErrorReason.setText("");
+            } else {
+                dbeaverErrorReason.setText("Invalid encrypted string");
+            }
+        } else {
+            dbeaverPassword.setText("");
+            dbeaverErrorReason.setText("");
+        }
+    }
+
+    private static void xorStringByKey(byte[] plainBytes) {
+        int keyOffset = 0;
+        for (int i = 0; i < plainBytes.length; ++i) {
+            byte keyChar = DBEAVER_ENCRYPTION_KEY[keyOffset];
+            ++keyOffset;
+            if (keyOffset >= DBEAVER_ENCRYPTION_KEY.length) {
+                keyOffset = 0;
+            }
+            plainBytes[i] ^= keyChar;
         }
     }
 
