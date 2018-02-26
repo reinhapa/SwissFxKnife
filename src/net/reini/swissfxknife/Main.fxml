@@ -130,6 +130,38 @@
             </GridPane>
           </content>
         </Tab>
+            <Tab text="Bison Credentials">
+               <content>
+                  <GridPane hgap="5.0" minWidth="-1.0" prefWidth="-1.0" vgap="5.0">
+                     <children>
+                        <Label text="Credentials" />
+                        <TextField fx:id="credentialsFile" promptText="credentials file location" GridPane.columnIndex="1" />
+                        <TableView fx:id="credentialsContent" prefHeight="264.0" prefWidth="490.0" GridPane.columnSpan="2147483647" GridPane.rowIndex="1" />
+                        <HBox alignment="CENTER_RIGHT" spacing="5.0" GridPane.columnIndex="1" GridPane.rowIndex="3">
+                           <children>
+                              <Button fx:id="addCredential" mnemonicParsing="false" snapToPixel="false" text="Add" />
+                              <Button fx:id="loadCredential" mnemonicParsing="false" snapToPixel="false" text="Load" />
+                              <Button fx:id="saveCredential" mnemonicParsing="false" snapToPixel="false" text="Save" />
+                           </children>
+                        </HBox>
+                     </children>
+                     <columnConstraints>
+                        <ColumnConstraints hgrow="NEVER" maxWidth="-1.0" minWidth="-1.0" prefWidth="-1.0" />
+                        <ColumnConstraints hgrow="ALWAYS" />
+                        <ColumnConstraints />
+                     </columnConstraints>
+                     <padding>
+                        <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                     </padding>
+                     <rowConstraints>
+                        <RowConstraints />
+                        <RowConstraints vgrow="ALWAYS" />
+                        <RowConstraints />
+                        <RowConstraints />
+                     </rowConstraints>
+                  </GridPane>
+               </content>
+            </Tab>
       </tabs>
     </TabPane>
   </center>

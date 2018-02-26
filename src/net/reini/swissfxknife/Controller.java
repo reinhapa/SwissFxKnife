@@ -30,9 +30,11 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.Dragboard;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.TransferMode;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -52,7 +54,9 @@ public class Controller {
     private static final KeyCodeCombination OPEN_FILE_COMBINATION =
             new KeyCodeCombination(KeyCode.O, KeyCodeCombination.CONTROL_DOWN);
 
-    private final ObservableList<ConfigEntry> configData = FXCollections.observableArrayList();
+    private final ObservableList<KeyValueEntry> configData = FXCollections.observableArrayList();
+    private final ObservableList<KeyValueEntry> credentialData =
+            FXCollections.observableArrayList();
 
     private Cipher jaasCipher;
     private Cipher installerCipher;
@@ -83,13 +87,24 @@ public class Controller {
     @FXML
     private TextField configFile;
     @FXML
-    private TableView<ConfigEntry> configContent;
+    private TableView<KeyValueEntry> configContent;
     @FXML
     private Button addConfig;
     @FXML
     private Button loadConfig;
     @FXML
     private Button saveConfig;
+
+    @FXML
+    private TextField credentialsFile;
+    @FXML
+    private TableView<KeyValueEntry> credentialsContent;
+    @FXML
+    private Button addCredential;
+    @FXML
+    private Button loadCredential;
+    @FXML
+    private Button saveCredential;
 
     @FXML
     private void initialize() throws Exception {
@@ -102,65 +117,94 @@ public class Controller {
         installerPassword.textProperty().addListener(this::installerPasswordChanged);
         installerPasswordEncrypted.textProperty()
                 .addListener(this::installerPasswordEncryptedChanged);
-        TableColumn<ConfigEntry, String> key = new TableColumn<>("Key");
+
+        // config file
+        TableColumn<KeyValueEntry, String> key = new TableColumn<>("Key");
         key.setSortable(false);
         key.setMinWidth(150.0);
         key.setPrefWidth(200.0);
-        key.setCellValueFactory(new PropertyValueFactory<ConfigEntry, String>("key"));
-        TableColumn<ConfigEntry, String> value = new TableColumn<>("Value");
+        key.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("key"));
+        TableColumn<KeyValueEntry, String> value = new TableColumn<>("Value");
         value.setSortable(false);
         value.setMinWidth(200.0);
         value.setPrefWidth(500.0);
-        value.setCellValueFactory(new PropertyValueFactory<ConfigEntry, String>("value"));
+        value.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("value"));
         value.setCellFactory(TextFieldTableCell.forTableColumn());
-        ObservableList<TableColumn<ConfigEntry, ?>> columns = configContent.getColumns();
-        columns.add(key);
-        columns.add(value);
+        ObservableList<TableColumn<KeyValueEntry, ?>> configColumns = configContent.getColumns();
+        configColumns.add(key);
+        configColumns.add(value);
         configContent.setEditable(true);
         configContent.itemsProperty().set(configData.sorted(
                 Comparator.comparing(c -> c.getKey().toLowerCase(), Comparator.naturalOrder())));
         configFile.textProperty().addListener(this::configFileChanged);
-        configFile.setOnDragOver(event -> {
-            /*
-             * accept it only if it is not dragged from the same node and if it has a string data
-             */
-            if (event.getGestureSource() != configFile && event.getDragboard().hasFiles()) {
-                /* allow for both copying and moving, whatever user chooses */
-                event.acceptTransferModes(TransferMode.ANY);
-            }
-            event.consume();
-        });
-        configFile.setOnDragDropped(event -> {
-            /* if there is a string data on dragboard, read it and use it */
-            Dragboard db = event.getDragboard();
-            boolean success = false;
-            if (db.hasFiles()) {
-                List<File> files = db.getFiles();
-                if (!files.isEmpty()) {
-                    configFile.setText(files.get(0).getAbsolutePath());
-                    success = true;
-                }
-            }
-            /*
-             * let the source know whether the string was successfully transferred and used
-             */
-            event.setDropCompleted(success);
-            event.consume();
-        });
-        configFile.setOnKeyPressed(event -> {
-            if (OPEN_FILE_COMBINATION.match(event)) {
-                Platform.runLater(() -> selectFile());
-                event.consume();
-            }
-        });
+        configFile.setOnDragOver(event -> onDragOver(event, configFile));
+        configFile.setOnDragDropped(event -> onDragDropped(event, configFile));
+        configFile.setOnKeyPressed(event -> openFileAction(event, () -> selectConfigFile()));
         addConfig.disableProperty().bind(configFile.textProperty().isEmpty());
-        addConfig.setOnAction(event -> {
-            configData.add(ConfigEntry.create("", ""));
-        });
+        addConfig.setOnAction(event -> configData.add(KeyValueEntry.create("", "")));
         loadConfig.disableProperty().bind(configFile.textProperty().isEmpty());
         loadConfig.setOnAction(event -> loadConfig(configFile.getText()));
         saveConfig.disableProperty().bind(configFile.textProperty().isEmpty());
         saveConfig.setOnAction(event -> saveConfig(configFile.getText()));
+
+        // credentials file
+        TableColumn<KeyValueEntry, String> alias = new TableColumn<>("Alias");
+        alias.setSortable(false);
+        alias.setMinWidth(300.0);
+        alias.setPrefWidth(400.0);
+        alias.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("key"));
+        TableColumn<KeyValueEntry, String> credential = new TableColumn<>("Credential");
+        credential.setSortable(false);
+        credential.setMinWidth(200.0);
+        credential.setPrefWidth(500.0);
+        credential.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("value"));
+        credential.setCellFactory(TextFieldTableCell.forTableColumn());
+        ObservableList<TableColumn<KeyValueEntry, ?>> credentialsColumns =
+                credentialsContent.getColumns();
+        credentialsColumns.add(alias);
+        credentialsColumns.add(credential);
+        credentialsContent.setEditable(true);
+        credentialsContent.itemsProperty().set(credentialData.sorted(
+                Comparator.comparing(c -> c.getKey().toLowerCase(), Comparator.naturalOrder())));
+        credentialsFile.textProperty().addListener(this::credentialsFileChanged);
+        credentialsFile.setOnDragOver(event -> onDragOver(event, credentialsFile));
+        credentialsFile.setOnDragDropped(event -> onDragDropped(event, credentialsFile));
+        credentialsFile
+                .setOnKeyPressed(event -> openFileAction(event, () -> selectCredentialsFile()));
+        addCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
+        addCredential.setOnAction(event -> credentialData.add(KeyValueEntry.create("", "")));
+        loadCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
+        loadCredential.setOnAction(event -> loadConfig(credentialsFile.getText()));
+        saveCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
+        saveCredential.setOnAction(event -> saveConfig(credentialsFile.getText()));
+    }
+
+    void openFileAction(KeyEvent event, Runnable openFileAction) {
+        if (OPEN_FILE_COMBINATION.match(event)) {
+            Platform.runLater(openFileAction);
+            event.consume();
+        }
+    }
+
+    void onDragDropped(DragEvent event, TextField fileField) {
+        Dragboard db = event.getDragboard();
+        boolean success = false;
+        if (db.hasFiles()) {
+            List<File> files = db.getFiles();
+            if (!files.isEmpty()) {
+                fileField.setText(files.get(0).getAbsolutePath());
+                success = true;
+            }
+        }
+        event.setDropCompleted(success);
+        event.consume();
+    }
+
+    void onDragOver(DragEvent event, TextField fileField) {
+        if (event.getGestureSource() != fileField && event.getDragboard().hasFiles()) {
+            event.acceptTransferModes(TransferMode.ANY);
+        }
+        event.consume();
     }
 
     void initialize(Stage stage, Preferences preferences) {
@@ -284,7 +328,7 @@ public class Controller {
         Platform.runLater(() -> {
             configData.clear();
             ConfigAccess.read(Paths.get(filename),
-                    (k, v) -> configData.add(ConfigEntry.create(k, v)));
+                    (k, v) -> configData.add(KeyValueEntry.create(k, v)));
         });
     }
 
@@ -293,7 +337,7 @@ public class Controller {
                 .forEach(entry -> valueConsumer.accept(entry.getKey(), entry.getValue()))));
     }
 
-    void selectFile() {
+    void selectConfigFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select config file");
         fileChooser.setInitialDirectory(
@@ -304,6 +348,44 @@ public class Controller {
         if (file != null) {
             prefs.put("configFileDir", file.getParentFile().getAbsolutePath());
             configFile.setText(file.getAbsolutePath());
+        }
+    }
+
+    void credentialsFileChanged(ObservableValue<? extends String> observable, String oldValue,
+            String newValue) {
+        if (newValue.equals(oldValue)) {
+            return;
+        } else if (newValue.isEmpty()) {
+            credentialData.clear();
+        }
+        loadCredentials(newValue);
+    }
+
+    void loadCredentials(String filename) {
+        Platform.runLater(() -> {
+            credentialData.clear();
+            CredentialAccess.read(Paths.get(filename),
+                    (k, v) -> credentialData.add(KeyValueEntry.create(k, v)));
+        });
+    }
+
+    void saveCredentials(String filename) {
+        Platform.runLater(
+                () -> CredentialAccess.write(Paths.get(filename), valueConsumer -> credentialData
+                .forEach(entry -> valueConsumer.accept(entry.getKey(), entry.getValue()))));
+    }
+
+    void selectCredentialsFile() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select credentials file");
+        fileChooser.setInitialDirectory(
+                new File(prefs.get("credentialsFileDir", System.getProperty("user.home"))));
+        fileChooser.getExtensionFilters()
+                .add(new ExtensionFilter("Credentials files", "bisonCredentials.jceks"));
+        File file = fileChooser.showOpenDialog(mainStage);
+        if (file != null) {
+            prefs.put("credentialsFileDir", file.getParentFile().getAbsolutePath());
+            credentialsFile.setText(file.getAbsolutePath());
         }
     }
 }

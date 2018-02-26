@@ -3,15 +3,15 @@ package net.reini.swissfxknife;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public final class ConfigEntry {
+public final class KeyValueEntry {
     private final SimpleStringProperty key;
     private final SimpleStringProperty value;
 
-    public static ConfigEntry create(String key, String value) {
-        return new ConfigEntry(key, value);
+    public static KeyValueEntry create(String key, String value) {
+        return new KeyValueEntry(key, value);
     }
 
-    private ConfigEntry(String key, String value) {
+    private KeyValueEntry(String key, String value) {
         this.key = new SimpleStringProperty(key);
         this.value = new SimpleStringProperty(value);
     }
@@ -34,6 +34,6 @@ public final class ConfigEntry {
 
     @Override
     public String toString() {
-        return String.format("ConfigEntry [key=%s, value=%s]", key, value);
+        return String.format("KeyValueEntry [key=%s, value=%s]", key, value);
     }
 }

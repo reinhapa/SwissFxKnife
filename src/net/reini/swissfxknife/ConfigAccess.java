@@ -1,6 +1,5 @@
 package net.reini.swissfxknife;
 
-
 import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.Files.newInputStream;
 import static java.nio.file.Files.newOutputStream;
@@ -20,6 +19,8 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
@@ -34,16 +35,16 @@ import javax.crypto.spec.SecretKeySpec;
 
 
 /**
- * Central class to encode and decode configuration specific informations for bison
+ * Central class to encode and decode configuration specific informations for bison.
  * 
  * @author Patrick Reinhart
  */
 final class ConfigAccess {
     private static final String C_TYPE = "DES";
     private static final String CONFIG_BIN_FILENAME = "config.bin";
+    private static final Logger LOGGER = Logger.getLogger(ConfigAccess.class.getName());
 
-    private ConfigAccess() {
-    }
+    private ConfigAccess() {}
 
     static void read(Path config, BiConsumer<String, String> valueConsumer) {
         if (isRegularFile(config)) {
@@ -62,7 +63,7 @@ final class ConfigAccess {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to read: " + config, e);
             }
         }
     }
@@ -81,7 +82,7 @@ final class ConfigAccess {
                     }
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                LOGGER.log(Level.SEVERE, "Failed to write: " + config, e);
             }
         }
     }
