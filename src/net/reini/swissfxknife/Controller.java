@@ -174,9 +174,9 @@ public class Controller {
         addCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
         addCredential.setOnAction(event -> credentialData.add(KeyValueEntry.create("", "")));
         loadCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
-        loadCredential.setOnAction(event -> loadConfig(credentialsFile.getText()));
+        loadCredential.setOnAction(event -> loadCredentials(credentialsFile.getText()));
         saveCredential.disableProperty().bind(credentialsFile.textProperty().isEmpty());
-        saveCredential.setOnAction(event -> saveConfig(credentialsFile.getText()));
+        saveCredential.setOnAction(event -> saveCredentials(credentialsFile.getText()));
     }
 
     void openFileAction(KeyEvent event, Runnable openFileAction) {
