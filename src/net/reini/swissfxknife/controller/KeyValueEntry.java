@@ -1,4 +1,4 @@
-package net.reini.swissfxknife;
+package net.reini.swissfxknife.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

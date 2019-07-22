@@ -7,6 +7,8 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import net.reini.swissfxknife.controller.Controller;
+import net.reini.swissfxknife.controller.WindowSettings;
 
 public class Main extends Application {
     @Override

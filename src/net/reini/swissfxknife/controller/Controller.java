@@ -1,4 +1,4 @@
-package net.reini.swissfxknife;
+package net.reini.swissfxknife.controller;
 
 import java.io.File;
 import java.math.BigInteger;
@@ -40,7 +40,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
-public class Controller {
+public final class Controller {
     private static final byte[] JAAS_KB =
             {'j', 'a', 'a', 's', ' ', 'i', 's', ' ', 't', 'h', 'e', ' ', 'w', 'a', 'y'};
     private static final byte[] INSTALLER_KB = {76, -101, -45, 56, 119, 73, -40, 112, -91, 3, -11,
@@ -207,7 +207,7 @@ public class Controller {
         event.consume();
     }
 
-    void initialize(Stage stage, Preferences preferences) {
+    public void initialize(Stage stage, Preferences preferences) {
         mainStage = stage;
         prefs = preferences;
     }

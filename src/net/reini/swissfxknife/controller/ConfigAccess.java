@@ -1,4 +1,4 @@
-package net.reini.swissfxknife;
+package net.reini.swissfxknife.controller;
 
 import static java.nio.file.Files.isRegularFile;
 import static java.nio.file.Files.newInputStream;

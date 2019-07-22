@@ -1,4 +1,4 @@
-package net.reini.swissfxknife;
+package net.reini.swissfxknife.controller;
 
 import java.io.FilterOutputStream;
 import java.io.IOException;
