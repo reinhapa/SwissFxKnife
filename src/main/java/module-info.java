@@ -3,9 +3,8 @@ module net.reini.swissfxknife {
     requires java.prefs;
     requires javafx.controls;
     requires javafx.fxml;
-    requires org.bouncycastle.provider;
 
-    opens net.reini.swissfxknife.controller to javafx.fxml;
+    opens net.reini.swissfxknife.controller to javafx.fxml, javafx.base;
     exports net.reini.swissfxknife;
 }
 

@@ -25,18 +25,17 @@ import java.util.logging.Logger;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bouncycastle.asn1.DEROctetString;
-
 /**
  * Central class to read and write bison elytron credential key store.
- * 
+ *
  * @author Patrick Reinhart
  */
 final class CredentialAccess {
     private static final char[] KEYSTORE_PASSWORD = "3lytr0n".toCharArray();
     private static final Logger LOGGER = Logger.getLogger(ConfigAccess.class.getName());
 
-    private CredentialAccess() {}
+    private CredentialAccess() {
+    }
 
     static void read(Path config, BiConsumer<String, String> valueConsumer) {
         if (isRegularFile(config)) {
@@ -44,10 +43,7 @@ final class CredentialAccess {
                 KeyStore keyStore = loadKeystore(config);
                 for (String alias : list(keyStore.aliases())) {
                     Key key = keyStore.getKey(alias, KEYSTORE_PASSWORD);
-                    DEROctetString derOctetString =
-                            (DEROctetString) DEROctetString.fromByteArray(key.getEncoded());
-                    valueConsumer.accept(alias,
-                            new String(derOctetString.getOctets(), StandardCharsets.UTF_8));
+                    valueConsumer.accept(alias, getDecoded(key.getEncoded()));
                 }
             } catch (NoSuchAlgorithmException | CertificateException | KeyStoreException
                     | IOException | UnrecoverableKeyException e) {
@@ -77,14 +73,12 @@ final class CredentialAccess {
     }
 
     static void updateKey(KeyStore keyStore, Set<String> currentCredentials, String alias,
-            String clearPassword) {
+                          String clearPassword) {
         try {
             currentCredentials.remove(alias);
-            Key key = new SecretKeySpec(
-                    new DEROctetString(clearPassword.getBytes(StandardCharsets.UTF_8)).getEncoded(),
-                    "1.2.840.113549.1.7.1");
+            Key key = new SecretKeySpec(getEncoded(clearPassword), "1.2.840.113549.1.7.1");
             keyStore.setKeyEntry(alias, key, KEYSTORE_PASSWORD, null);
-        } catch (KeyStoreException | IOException e) {
+        } catch (KeyStoreException e) {
             throw new IllegalStateException("Unable to update key", e);
         }
     }
@@ -97,5 +91,28 @@ final class CredentialAccess {
             keyStore.load(in, KEYSTORE_PASSWORD);
         }
         return keyStore;
+    }
+
+    static byte[] getEncoded(String clearText) {
+        byte[] utf8bytes = clearText.getBytes(StandardCharsets.UTF_8);
+        int length = utf8bytes.length;
+        byte[] result = new byte[length + 2];
+        result[0] = 4;
+        result[1] = (byte) length;
+        System.arraycopy(utf8bytes, 0, result, 2, length);
+        return result;
+    }
+
+    static String getDecoded(byte[] encoded) {
+        if (encoded.length > 1) {
+            if (encoded[0] == 4) {
+                return new String(encoded, 2, encoded[1], StandardCharsets.UTF_8);
+            } else {
+                LOGGER.severe(() -> "Encoded type wrong: " + encoded[0]);
+            }
+        }else {
+            LOGGER.severe(() -> "Encoded length too small: " + encoded.length);
+        }
+        return "";
     }
 }
