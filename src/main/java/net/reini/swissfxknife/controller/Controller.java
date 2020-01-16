@@ -340,8 +340,7 @@ public final class Controller {
     void selectConfigFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select config file");
-        fileChooser.setInitialDirectory(
-                new File(prefs.get("configFileDir", System.getProperty("user.home"))));
+        fileChooser.setInitialDirectory(initialDirectory("configFileDir"));
         fileChooser.getExtensionFilters()
                 .add(new ExtensionFilter("Config files", "config.jar", "config.bin"));
         File file = fileChooser.showOpenDialog(mainStage);
@@ -349,6 +348,14 @@ public final class Controller {
             prefs.put("configFileDir", file.getParentFile().getAbsolutePath());
             configFile.setText(file.getAbsolutePath());
         }
+    }
+
+    File initialDirectory(String prefName) {
+        File initialDir = new File(prefs.get(prefName, System.getProperty("user.home")));
+        if (!initialDir.exists()) {
+            initialDir = new File(System.getProperty("user.home"));
+        }
+        return initialDir;
     }
 
     void credentialsFileChanged(ObservableValue<? extends String> observable, String oldValue,
@@ -372,14 +379,13 @@ public final class Controller {
     void saveCredentials(String filename) {
         Platform.runLater(
                 () -> CredentialAccess.write(Paths.get(filename), valueConsumer -> credentialData
-                .forEach(entry -> valueConsumer.accept(entry.getKey(), entry.getValue()))));
+                        .forEach(entry -> valueConsumer.accept(entry.getKey(), entry.getValue()))));
     }
 
     void selectCredentialsFile() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Select credentials file");
-        fileChooser.setInitialDirectory(
-                new File(prefs.get("credentialsFileDir", System.getProperty("user.home"))));
+        fileChooser.setInitialDirectory(initialDirectory("credentialsFileDir"));
         fileChooser.getExtensionFilters()
                 .add(new ExtensionFilter("Credentials files", "bisonCredentials.jceks"));
         File file = fileChooser.showOpenDialog(mainStage);
