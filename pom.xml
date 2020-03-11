@@ -16,7 +16,7 @@
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
-      <version>13.0.2</version>
+      <version>14</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
