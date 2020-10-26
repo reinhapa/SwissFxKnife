@@ -1,5 +1,6 @@
-SwissFxKnife
+SwissFxKnife 
 ============
+[![Build Status](https://travis-ci.com/reinhapa/SwissFxKnife.svg?branch=master)](https://travis-ci.com/reinhapa/SwissFxKnife)
 
 Build & run using Maven
 
