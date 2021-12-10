@@ -124,6 +124,7 @@ public final class Controller {
         key.setMinWidth(150.0);
         key.setPrefWidth(200.0);
         key.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("key"));
+        key.setCellFactory(TextFieldTableCell.forTableColumn());
         TableColumn<KeyValueEntry, String> value = new TableColumn<>("Value");
         value.setSortable(false);
         value.setMinWidth(200.0);
@@ -153,6 +154,7 @@ public final class Controller {
         alias.setMinWidth(300.0);
         alias.setPrefWidth(400.0);
         alias.setCellValueFactory(new PropertyValueFactory<KeyValueEntry, String>("key"));
+        alias.setCellFactory(TextFieldTableCell.forTableColumn());
         TableColumn<KeyValueEntry, String> credential = new TableColumn<>("Credential");
         credential.setSortable(false);
         credential.setMinWidth(200.0);
