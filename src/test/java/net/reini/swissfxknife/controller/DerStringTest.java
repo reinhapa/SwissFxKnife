@@ -1,5 +1,7 @@
 package net.reini.swissfxknife.controller;
 
+import org.junit.jupiter.api.Test;
+
 import static java.util.Collections.list;
 
 import java.nio.charset.StandardCharsets;
@@ -9,13 +11,12 @@ import java.util.HashSet;
 
 import javax.crypto.spec.SecretKeySpec;
 
-import org.junit.Test;
 
-public class DerStringTest {
+class DerStringTest {
     private static final char[] KEYSTORE_PASSWORD = "3lytr0n".toCharArray();
 
     @Test
-    public void testDEROctetString() throws Exception {
+    void testDEROctetString() throws Exception {
         byte[] derOctetBytes = CredentialAccess.getEncoded("clearPassword");
         System.out.println(derOctetBytes);
 
