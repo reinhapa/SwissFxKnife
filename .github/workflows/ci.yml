@@ -27,7 +27,7 @@ jobs:
         cache: 'gradle'
     - run: gradlew build --no-daemon
     - uses: actions/upload-artifact@v3
-      if: ${{ allways() }}
+      if: ${{ always() }}
       with:
         name: ${{ matrix.distribution }}-jdk${{ matrix.jdk }}-build-logs
         retention-days: 5
