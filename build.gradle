@@ -1,6 +1,7 @@
 plugins {
   id 'application'
   id 'org.openjfx.javafxplugin' version '0.0.14'
+  id 'com.github.hierynomus.license' version '0.16.1'
 }
 
 repositories {
@@ -12,6 +13,15 @@ dependencies {
     runtimeOnly 'ch.qos.logback:logback-classic:1.4.8'
     testImplementation 'org.junit.jupiter:junit-jupiter-params:5.9.3'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.3'
+}
+
+application {
+  mainClass = 'net.reini.swissfxknife.Main'
+  mainModule = 'net.reini.swissfxknife'
+}
+
+license {
+    header rootProject.file('gradle/LICENSE_HEADER')
 }
 
 java {
@@ -26,6 +36,9 @@ javafx {
 
 run {
 //    args = [ '-Dcom.sun.javafx.fontSize=18', '-Dcom.sun.javafx.screenDPI=300' ]
+    jvmArgs '-Dprism.forceGPU=true'
+    jvmArgs '-Dprism.verbose=true'
+    jvmArgs '-Dglass.platform=gtk'
     debugOptions {
         port = 8000
         host = '*'
@@ -40,6 +53,3 @@ test {
     events 'skipped'
   }
 }
-
-application.mainModule = 'net.reini.swissfxknife'
-mainClassName = 'net.reini.swissfxknife.Main'
