@@ -12,22 +12,18 @@ import net.reini.swissfxknife.controller.WindowSettings;
 
 public class Main extends Application {
     @Override
-    public void start(Stage primaryStage) {
-        try {
-            Preferences prefs = Preferences.userNodeForPackage(getClass());
-            WindowSettings settings = WindowSettings.create(prefs);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
-            Scene scene = new Scene(loader.load());
-            Controller controller = loader.<Controller>getController();
-            controller.initialize(primaryStage, prefs);
-            primaryStage.setTitle("Reini's SwissFxKnife");
-            primaryStage.setScene(scene);
-            settings.update(primaryStage);
-            primaryStage.show();
-            primaryStage.setOnCloseRequest(event -> settings.store(primaryStage));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void start(Stage primaryStage) throws IOException {
+        Preferences prefs = Preferences.userNodeForPackage(getClass());
+        WindowSettings settings = WindowSettings.create(prefs);
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("Main.fxml"));
+        Scene scene = new Scene(loader.load());
+        Controller controller = loader.getController();
+        controller.initialize(primaryStage, prefs);
+        primaryStage.setTitle("Reini's SwissFxKnife");
+        primaryStage.setScene(scene);
+        settings.update(primaryStage);
+        primaryStage.show();
+        primaryStage.setOnCloseRequest(event -> settings.store(primaryStage));
     }
 
     public static void main(String[] args) {

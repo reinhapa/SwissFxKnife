@@ -21,6 +21,13 @@ public final class WindowSettings {
         this.prefs = prefs;
     }
 
+    public void reset() {
+        prefs.remove("x");
+        prefs.remove("y");
+        prefs.remove("w");
+        prefs.remove("h");
+    }
+
     public void update(Stage primaryStage) {
         primaryStage.setX(prefs.getDouble("x", primaryStage.getX()));
         primaryStage.setY(prefs.getDouble("y", primaryStage.getY()));
