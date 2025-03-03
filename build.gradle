@@ -5,14 +5,12 @@ plugins {
 }
 
 repositories {
-    mavenCentral()
+  mavenCentral()
 }
 
 dependencies {
-    implementation 'org.slf4j:slf4j-api:2.0.16'
-    runtimeOnly 'ch.qos.logback:logback-classic:1.5.16'
-    testImplementation 'org.junit.jupiter:junit-jupiter-params:5.12.0'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.12.0'
+  implementation 'org.slf4j:slf4j-api:2.0.16'
+  runtimeOnly 'ch.qos.logback:logback-classic:1.5.16'
 }
 
 application {
@@ -21,35 +19,42 @@ application {
 }
 
 license {
-    header rootProject.file('gradle/LICENSE_HEADER')
+  header = rootProject.file('gradle/LICENSE_HEADER')
 }
 
 java {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
+  sourceCompatibility = JavaVersion.VERSION_17
+  targetCompatibility = JavaVersion.VERSION_17
 }
 
 javafx {
-    version = '20-ea+11'
-    modules = [ 'javafx.controls', 'javafx.fxml' ]
+  version = '20-ea+11'
+  modules = [ 'javafx.controls', 'javafx.fxml' ]
 }
 
 run {
-//    args = [ '-Dcom.sun.javafx.fontSize=18', '-Dcom.sun.javafx.screenDPI=300' ]
-    jvmArgs '-Dprism.forceGPU=true'
-    jvmArgs '-Dprism.verbose=true'
-    jvmArgs '-Dglass.platform=gtk'
-    debugOptions {
-        port = 8000
-        host = '*'
-        server = true
-        suspend = false
-    }
+//  args = [ '-Dcom.sun.javafx.fontSize=18', '-Dcom.sun.javafx.screenDPI=300' ]
+  jvmArgs '-Dprism.forceGPU=true'
+  jvmArgs '-Dprism.verbose=true'
+  jvmArgs '-Dglass.platform=gtk'
+  debugOptions {
+    port = 8000
+    host = '*'
+    server = true
+    suspend = false
+  }
 }
 
-test {
-  useJUnitPlatform()
-  testLogging {
-    events 'skipped'
+
+testing {
+  suites {
+    test {
+      useJUnitJupiter()
+      dependencies {
+        implementation 'org.mockito:mockito-junit-jupiter:5.15.2'
+        implementation 'org.assertj:assertj-core:3.27.3'
+        implementation 'org.simplify4u:slf4j-mock:2.4.0'
+      }
+    }
   }
 }
