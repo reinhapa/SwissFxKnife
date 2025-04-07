@@ -51,7 +51,7 @@ testing {
     test {
       useJUnitJupiter()
       dependencies {
-        implementation 'org.mockito:mockito-junit-jupiter:5.16.1'
+        implementation 'org.mockito:mockito-junit-jupiter:5.17.0'
         implementation 'org.assertj:assertj-core:3.27.3'
         implementation 'org.simplify4u:slf4j-mock:2.4.0'
       }
